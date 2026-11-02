@@ -1,6 +1,6 @@
 // Dirección del repositorio público con el código fuente (obligatorio por GPL al distribuir).
 // Completala cuando publiques el repositorio en GitHub.
-const SOURCE_URL = '';
+const SOURCE_URL = 'https://github.com/gastonfarq-bot/grts-blocker-pro';
 
 const $ = (s) => document.querySelector(s);
 const send = (m) => chrome.runtime.sendMessage(m);
