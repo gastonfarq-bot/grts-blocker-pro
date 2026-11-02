@@ -24,7 +24,7 @@ from privacy_extras import EXTRAS  # noqa: E402
 LISTS_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / 'lists'
 DIST = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE.parent / 'dist'
 OUT = DIST / '_core'
-VERSION = '2.0.0'
+VERSION = '2.0.1'
 NAME = 'GRTS Blocker Pro'
 GECKO_ID = 'grts-blocker-pro@grts-blocker.app'
 

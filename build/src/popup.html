@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <style>
-  :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea; --accent: #c0392b; --card: #f5f5f7; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #1c1c1e; --fg: #f2f2f7; --muted: #98989d; --line: #38383a; --card: #2c2c2e; } }
+  :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea; --accent: #c0392b; --accent-text: #c0392b; --card: #f5f5f7; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1c1c1e; --fg: #f2f2f7; --muted: #98989d; --line: #38383a; --card: #2c2c2e; --accent-text: #ff7b6b; } }
+  [hidden] { display: none !important; }
   * { box-sizing: border-box; }
   body { margin: 0; width: 300px; background: var(--bg); color: var(--fg); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
   header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
   h1 { font-size: 15px; margin: 0; letter-spacing: -.01em; }
   .count { padding: 18px 16px 8px; text-align: center; }
-  .count b { display: block; font-size: 34px; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .count b { display: block; font-size: 34px; font-weight: 700; color: var(--accent-text); line-height: 1.1; font-variant-numeric: tabular-nums; }
   .count span { color: var(--muted); }
   .host { text-align: center; color: var(--muted); font-size: 12px; padding-bottom: 12px; word-break: break-all; }
   section { padding: 10px 16px; border-top: 1px solid var(--line); }
@@ -29,7 +30,7 @@
   li button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 14px; }
   .note { color: var(--muted); font-size: 11px; padding: 8px 16px 12px; }
   .off { opacity: .45; pointer-events: none; }
-  button.link { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+  button.link { border: 0; background: none; color: var(--accent-text); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
   button.link:disabled { color: var(--muted); cursor: default; }
   #upd { color: var(--muted); font-size: 12px; }
   .warn { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: var(--card); font-size: 12px; line-height: 1.45; }

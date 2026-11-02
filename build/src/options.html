@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GRTS Blocker Pro · Licencia</title>
 <style>
-  :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #5f5f66; --line: #e5e5ea; --accent: #c0392b; --card: #f5f5f7; --ok: #1e7d4f; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #121212; --fg: #f2f2f2; --muted: #b0b0b5; --line: #333; --card: #1d1d1d; --ok: #4cc38a; } }
+  :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #5f5f66; --line: #e5e5ea; --accent: #c0392b; --card: #f5f5f7; --ok: #1e7d4f; --link: #c0392b; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #121212; --fg: #f2f2f2; --muted: #b0b0b5; --line: #333; --card: #1d1d1d; --ok: #4cc38a; --link: #ff7b6b; } }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
   main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; display: flex; flex-direction: column; gap: 36px; }
   header { display: flex; align-items: center; gap: 14px; }
@@ -24,12 +25,12 @@
   button.sec { background: transparent; color: var(--fg); border: 1px solid var(--line); }
   #msg { margin-top: 10px; font-weight: 600; }
   #msg.ok { color: var(--ok); }
-  #msg.err { color: var(--accent); }
+  #msg.err { color: var(--link); }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { color: var(--muted); font-weight: 600; }
   .scroll { overflow-x: auto; }
-  a { color: var(--accent); }
+  a { color: var(--link); }
 </style>
 </head>
 <body>

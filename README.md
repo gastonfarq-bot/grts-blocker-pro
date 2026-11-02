@@ -35,7 +35,7 @@ las listas del día y las publica como *release* del repositorio.
 ## Compilar a mano
 
 ```
-pip install google-re2 soupsieve cryptography
+pip install google-re2 soupsieve beautifulsoup4 cryptography
 python build/tools/descargar_listas.py
 python build/build.py
 ```
@@ -58,7 +58,7 @@ comodidad, las actualizaciones y el soporte, como hacen AdGuard y otros producto
 ## Publicar en las tiendas
 
 1. **Código fuente público** (obligatorio por la GPL al distribuir): subir este repositorio a GitHub como
-   público y poner su dirección en `SOURCE_URL` de `build/src/options.js`.
+   público (https://github.com/gastonfarq-bot/grts-blocker-pro) — ya configurado en `build/src/options.js`.
 2. **Política de privacidad**: GRTS no recopila ni envía datos personales. Las tiendas piden un enlace
    público con ese texto.
 3. **Chrome Web Store** (registro único de 5 USD): subir `GRTSBlockerPro-store.zip`.
