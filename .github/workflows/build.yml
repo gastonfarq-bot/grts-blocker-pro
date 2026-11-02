@@ -23,7 +23,7 @@ jobs:
           python-version: '3.12'
 
       - name: Instalar dependencias
-        run: pip install google-re2 soupsieve cryptography
+        run: pip install google-re2 soupsieve beautifulsoup4 cryptography
 
       - name: Descargar listas de filtros
         run: python build/tools/descargar_listas.py
