@@ -1,0 +1,7 @@
+dist/
+build/lists/
+__pycache__/
+*.pyc
+# La clave privada de licencias NUNCA va al repositorio
+*clave-privada*
+*private*.txt

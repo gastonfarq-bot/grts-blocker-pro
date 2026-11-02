@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea; --accent: #c0392b; --card: #f5f5f7; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1c1c1e; --fg: #f2f2f7; --muted: #98989d; --line: #38383a; --card: #2c2c2e; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 300px; background: var(--bg); color: var(--fg); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  h1 { font-size: 15px; margin: 0; letter-spacing: -.01em; }
+  .count { padding: 18px 16px 8px; text-align: center; }
+  .count b { display: block; font-size: 34px; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .count span { color: var(--muted); }
+  .host { text-align: center; color: var(--muted); font-size: 12px; padding-bottom: 12px; word-break: break-all; }
+  section { padding: 10px 16px; border-top: 1px solid var(--line); }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; }
+  .switch { position: relative; width: 36px; height: 20px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .switch i { position: absolute; inset: 0; background: var(--line); border-radius: 20px; transition: .15s; cursor: pointer; }
+  .switch i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: .15s; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+  .switch input:checked + i { background: var(--accent); }
+  .switch input:checked + i::after { transform: translateX(16px); }
+  button.main { width: 100%; padding: 9px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 6px; font-weight: 600; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; gap: 8px; align-items: center; justify-content: space-between; background: var(--card); border-radius: 6px; padding: 5px 8px; margin-bottom: 4px; }
+  li code { font: 11px ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 14px; }
+  .note { color: var(--muted); font-size: 11px; padding: 8px 16px 12px; }
+  .off { opacity: .45; pointer-events: none; }
+  button.link { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+  button.link:disabled { color: var(--muted); cursor: default; }
+  #upd { color: var(--muted); font-size: 12px; }
+  .warn { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: var(--card); font-size: 12px; line-height: 1.45; }
+  .warn button { display: block; margin-top: 6px; }
+  .pro { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; background: var(--accent); color: #fff; font: 700 9px/1.5 system-ui, sans-serif; letter-spacing: .06em; vertical-align: 1px; font-style: normal; }
+  .locked .switch { opacity: .4; }
+  .locked .switch i { cursor: not-allowed; }
+  .lic { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .lic span { color: var(--muted); font-size: 12px; }
+  footer { display: flex; justify-content: space-between; padding: 0 16px 12px; }
+  footer button { font-size: 12px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>GRTS Blocker Pro <em class="pro" id="proBadge" hidden>PRO</em></h1>
+    <label class="switch" title="Activar o desactivar"><input type="checkbox" id="enabled"><i></i></label>
+  </header>
+  <div id="body">
+    <div class="count"><b id="blocked">0</b><span>bloqueos en esta página</span></div>
+    <div class="host" id="host"></div>
+    <section>
+      <div class="row"><span>Pausar en este sitio</span><label class="switch"><input type="checkbox" id="pause"><i></i></label></div>
+    </section>
+    <section>
+      <button class="main" id="pick">Eliminar un elemento de la página<em class="pro" id="pickPro">PRO</em></button>
+    </section>
+    <section id="customBox" hidden>
+      <h2>Mis reglas en este sitio</h2>
+      <ul id="custom"></ul>
+    </section>
+    <section>
+      <h2>Filtros</h2>
+      <div class="row"><span id="upd">—</span><button class="link" id="updNow">Actualizar ahora</button></div>
+      <div class="warn" id="usWarn" hidden>
+        Para que también se actualicen los filtros de páginas y de YouTube, activá <b>«Permitir scripts de usuario»</b> en la configuración de la extensión.
+        <button class="link" id="openSettings">Abrir configuración</button>
+      </div>
+      <div class="warn" id="rebuildWarn" hidden>Las listas cambiaron mucho desde que se instaló esta versión. Conviene pedir una versión nueva de la extensión.</div>
+    </section>
+    <section>
+      <h2>Protección</h2>
+      <div class="row"><span>Publicidad</span><label class="switch"><input type="checkbox" data-cat="ads"><i></i></label></div>
+      <div class="row"><span>Rastreadores</span><label class="switch"><input type="checkbox" data-cat="privacy"><i></i></label></div>
+      <div class="row" data-row="annoyances"><span>Avisos de cookies<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="annoyances"><i></i></label></div>
+      <div class="row"><span>Filtros en español</span><label class="switch"><input type="checkbox" data-cat="regional"><i></i></label></div>
+    </section>
+    <section>
+      <h2>Privacidad</h2>
+      <div class="row" data-row="clean"><span>Limpiar links de rastreo<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="clean"><i></i></label></div>
+      <div class="row" data-row="gpc"><span>Pedir que no vendan mis datos<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="gpc"><i></i></label></div>
+      <div class="row" data-row="cookies"><span>Bloquear cookies de terceros<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="cookies"><i></i></label></div>
+    </section>
+    <section>
+      <div class="lic"><span id="licText">Versión gratuita</span><button class="link" id="licBtn">Pasate a Pro</button></div>
+    </section>
+  </div>
+  <div class="note" id="note">Los cambios se aplican al recargar la página.</div>
+  <footer><button class="link" id="about">Licencias y código fuente</button></footer>
+  <script src="popup.js"></script>
+</body>
+</html>

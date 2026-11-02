@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de licencias GRTS Pro</title>
+<style>
+  :root { --bg: #121212; --card: #1d1d1d; --fg: #f2f2f2; --muted: #b5b5b5; --line: #333; --accent: #c0392b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; display: flex; flex-direction: column; gap: 18px; }
+  h1 { margin: 0; font-size: 26px; }
+  p { margin: 0; color: var(--muted); }
+  label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+  input, textarea { font: 14px ui-monospace, Consolas, monospace; background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  textarea { min-height: 84px; resize: vertical; }
+  .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 520px) { .row { grid-template-columns: minmax(0, 1fr); } }
+  button { min-height: 44px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; font: 600 16px system-ui, sans-serif; cursor: pointer; }
+  button.sec { background: #2a2a2a; }
+  .out { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; word-break: break-all; font: 13px ui-monospace, Consolas, monospace; }
+  .err { color: #ff8d80; }
+  small { color: var(--muted); font-weight: 400; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Generador de licencias GRTS Pro</h1>
+  <p>Todo se calcula en este navegador: la clave privada no sale de tu computadora. Usalo en Chrome 137 o posterior, Edge o Firefox.</p>
+
+  <label>Clave privada <small>(el contenido de tu archivo de clave privada; no la compartas nunca)</small>
+    <textarea id="priv" autocomplete="off" spellcheck="false"></textarea>
+  </label>
+  <div class="row">
+    <label>Nombre del cliente<input id="name" autocomplete="off"></label>
+    <label>Email del cliente<input id="email" type="email" autocomplete="off"></label>
+  </div>
+  <label>Vencimiento <small>(vacío = no vence; para suscripciones, poné la fecha de fin)</small>
+    <input id="exp" type="date">
+  </label>
+  <button id="go" type="button">Generar licencia</button>
+  <div id="out" class="out" hidden></div>
+  <button id="copy" class="sec" type="button" hidden>Copiar licencia</button>
+</main>
+<script>
+const $ = (s) => document.querySelector(s);
+const b64url = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+$('#go').onclick = async () => {
+  const out = $('#out');
+  out.hidden = false; out.className = 'out'; $('#copy').hidden = true;
+  try {
+    const name = $('#name').value.trim(), email = $('#email').value.trim();
+    if (!name || !email) throw new Error('Completá nombre y email.');
+    const der = Uint8Array.from(atob($('#priv').value.trim()), (c) => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey('pkcs8', der, { name: 'Ed25519' }, false, ['sign']);
+    const info = { v: 1, n: name, e: email, p: 'pro', d: new Date().toISOString().slice(0, 10) };
+    if ($('#exp').value) info.x = $('#exp').value;
+    const data = new TextEncoder().encode(JSON.stringify(info));
+    const sig = await crypto.subtle.sign({ name: 'Ed25519' }, key, data);
+    out.textContent = 'GRTS-' + b64url(data) + '.' + b64url(sig);
+    $('#copy').hidden = false;
+  } catch (e) {
+    out.className = 'out err';
+    out.textContent = e.message && !/DataError|invalid/i.test(e.name + e.message) ? e.message : 'La clave privada no es válida.';
+  }
+};
+$('#copy').onclick = async () => { await navigator.clipboard.writeText($('#out').textContent); $('#copy').textContent = 'Copiada'; setTimeout(() => ($('#copy').textContent = 'Copiar licencia'), 1500); };
+</script>
+</body>
+</html>

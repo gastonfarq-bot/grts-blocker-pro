@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRTS Blocker Pro · Licencia</title>
+<style>
+  :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #5f5f66; --line: #e5e5ea; --accent: #c0392b; --card: #f5f5f7; --ok: #1e7d4f; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #121212; --fg: #f2f2f2; --muted: #b0b0b5; --line: #333; --card: #1d1d1d; --ok: #4cc38a; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; display: flex; flex-direction: column; gap: 36px; }
+  header { display: flex; align-items: center; gap: 14px; }
+  header img { width: 48px; height: 48px; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -.01em; }
+  h2 { margin: 0 0 12px; font-size: 19px; }
+  p { margin: 0 0 10px; }
+  .muted { color: var(--muted); }
+  .card { background: var(--card); border-radius: 14px; padding: 20px; }
+  ul.feats { margin: 8px 0 0; padding-left: 20px; }
+  textarea { width: 100%; min-height: 90px; font: 13px ui-monospace, Consolas, monospace; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; font: 600 15px system-ui, sans-serif; cursor: pointer; }
+  button.sec { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  #msg { margin-top: 10px; font-weight: 600; }
+  #msg.ok { color: var(--ok); }
+  #msg.err { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icons/128.png" alt="">
+    <h1>GRTS Blocker Pro</h1>
+  </header>
+
+  <section id="licencia">
+    <h2>Licencia Pro</h2>
+    <div class="card" id="status"></div>
+    <div id="activateBox" style="margin-top: 16px">
+      <p class="muted">Con GRTS Pro sumás:</p>
+      <ul class="feats">
+        <li>Cierre automático de avisos de cookies</li>
+        <li>Limpieza de links de rastreo</li>
+        <li>Señal «No vender mis datos» (Global Privacy Control)</li>
+        <li>Bloqueo de cookies de terceros</li>
+        <li>Eliminar cualquier elemento de una página con un clic</li>
+      </ul>
+      <label for="key" style="display: block; margin-top: 18px; font-weight: 600">Pegá tu licencia</label>
+      <textarea id="key" placeholder="GRTS-…" spellcheck="false" autocomplete="off"></textarea>
+      <div class="actions"><button id="activate" type="button">Activar Pro</button></div>
+    </div>
+    <div class="actions" id="deactBox" hidden><button class="sec" id="deactivate" type="button">Quitar la licencia de este navegador</button></div>
+    <p id="msg" role="status"></p>
+  </section>
+
+  <section id="acerca">
+    <h2>Licencias y código fuente</h2>
+    <p>GRTS Blocker Pro es software libre, publicado bajo la <b>Licencia Pública General de GNU, versión 3 (GPL-3.0)</b>. Podés usarlo, estudiarlo, modificarlo y compartirlo según esa licencia; el texto completo está en el archivo <code>LICENSE</code> incluido en la extensión.</p>
+    <p id="source" class="muted"></p>
+    <p>Los filtros se construyen a partir de estas listas públicas, a cuyos autores agradecemos su trabajo:</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Lista</th><th>Licencia</th><th>Sitio</th></tr></thead>
+        <tbody id="lists"></tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top: 12px">Los scriptlets y los recursos de reemplazo (por ejemplo, los sustitutos de Google Analytics y Google Publisher Tag) están basados en los de <a href="https://github.com/gorhill/uBlock" target="_blank" rel="noopener">uBlock Origin</a> (GPL-3.0), de Raymond Hill y colaboradores.</p>
+  </section>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

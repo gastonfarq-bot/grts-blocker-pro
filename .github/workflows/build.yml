@@ -1,0 +1,55 @@
+# Compila GRTS Blocker Pro con las listas de filtros del día y publica los paquetes.
+# Corre todos los lunes, en cada cambio del código y cuando se lo pide a mano.
+name: Compilar GRTS Blocker Pro
+
+on:
+  schedule:
+    - cron: '17 9 * * 1'   # lunes 06:17 de Argentina
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install google-re2 soupsieve cryptography
+
+      - name: Descargar listas de filtros
+        run: python build/tools/descargar_listas.py
+
+      - name: Compilar las tres variantes
+        run: python build/build.py
+
+      - name: Empaquetar
+        run: |
+          cd dist
+          for v in chrome store firefox; do
+            (cd GRTSBlockerPro-$v && zip -qr ../GRTSBlockerPro-$v.zip .)
+          done
+          ls -la *.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GRTSBlockerPro
+          path: dist/*.zip
+
+      - name: Publicar versión
+        if: github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="filtros-$(date -u +%Y%m%d)"
+          gh release delete "$TAG" -y --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" dist/*.zip --title "GRTS Blocker Pro – filtros del $(date -u +%d/%m/%Y)" \
+            --notes "Paquetes compilados automáticamente con las listas de filtros del día."

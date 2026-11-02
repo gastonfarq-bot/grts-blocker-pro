@@ -1,0 +1,6 @@
+(function(){'use strict';const noop=function(){};const Tracker=function(){};const p=Tracker.prototype;p.get=noop;p.set=noop;p.send=noop;
+const w=window,gaName=w.GoogleAnalyticsObject||'ga',gaQ=w[gaName];
+const ga=function(){const len=arguments.length;if(len===0)return;const args=Array.from(arguments);let a=args[len-1];if(a instanceof Object&&a.hitCallback instanceof Function){try{a.hitCallback()}catch(e){}}else if(a instanceof Function){setTimeout(()=>{a(ga.create())},1)}else{const i=args.indexOf('hitCallback');if(i!==-1&&args[i+1] instanceof Function){try{args[i+1]()}catch(e){}}}};
+ga.create=function(){return new Tracker()};ga.getByName=function(){return new Tracker()};ga.getAll=function(){return[new Tracker()]};ga.remove=noop;ga.loaded=true;w[gaName]=ga;
+const dl=w.dataLayer;if(dl instanceof Object){if(dl.hide instanceof Object&&typeof dl.hide.end==='function'){dl.hide.end();dl.hide.end=()=>{}}if(typeof dl.push==='function'){const doCb=function(item){if(item instanceof Object===false)return;if(typeof item.eventCallback!=='function')return;setTimeout(item.eventCallback,1);item.eventCallback=()=>{}};dl.push=new Proxy(dl.push,{apply(t,th,a){doCb(a[0]);return Reflect.apply(t,th,a)}});if(Array.isArray(dl)){for(const it of dl.slice())doCb(it)}}}
+if(gaQ instanceof Function&&Array.isArray(gaQ.q)){for(const a of gaQ.q.slice()){ga(...a)}}})();
