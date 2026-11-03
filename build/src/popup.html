@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html>
 <head>
 <meta charset="utf-8">
 <style>
@@ -47,49 +47,50 @@
 <body>
   <header>
     <h1>GRTS Blocker Pro <em class="pro" id="proBadge" hidden>PRO</em></h1>
-    <label class="switch" title="Activar o desactivar"><input type="checkbox" id="enabled"><i></i></label>
+    <label class="switch" data-i18n-title="toggleTitle"><input type="checkbox" id="enabled"><i></i></label>
   </header>
   <div id="body">
-    <div class="count"><b id="blocked">0</b><span>bloqueos en esta página</span></div>
+    <div class="count"><b id="blocked">0</b><span data-i18n="blockedOnPage"></span></div>
     <div class="host" id="host"></div>
     <section>
-      <div class="row"><span>Pausar en este sitio</span><label class="switch"><input type="checkbox" id="pause"><i></i></label></div>
+      <div class="row"><span data-i18n="pauseSite"></span><label class="switch"><input type="checkbox" id="pause"><i></i></label></div>
     </section>
     <section>
-      <button class="main" id="pick">Eliminar un elemento de la página<em class="pro" id="pickPro">PRO</em></button>
+      <button class="main" id="pick"><span data-i18n="pickElement"></span><em class="pro" id="pickPro">PRO</em></button>
     </section>
     <section id="customBox" hidden>
-      <h2>Mis reglas en este sitio</h2>
+      <h2 data-i18n="myRules"></h2>
       <ul id="custom"></ul>
     </section>
     <section>
-      <h2>Filtros</h2>
-      <div class="row"><span id="upd">—</span><button class="link" id="updNow">Actualizar ahora</button></div>
+      <h2 data-i18n="filters"></h2>
+      <div class="row"><span id="upd">—</span><button class="link" id="updNow" data-i18n="updateNow"></button></div>
       <div class="warn" id="usWarn" hidden>
-        Para que también se actualicen los filtros de páginas y de YouTube, activá <b>«Permitir scripts de usuario»</b> en la configuración de la extensión.
-        <button class="link" id="openSettings">Abrir configuración</button>
+        <span data-i18n="usWarn"></span>
+        <button class="link" id="openSettings" data-i18n="openSettings"></button>
       </div>
-      <div class="warn" id="rebuildWarn" hidden>Las listas cambiaron mucho desde que se instaló esta versión. Conviene pedir una versión nueva de la extensión.</div>
+      <div class="warn" id="rebuildWarn" hidden data-i18n="rebuildWarn"></div>
     </section>
     <section>
-      <h2>Protección</h2>
-      <div class="row"><span>Publicidad</span><label class="switch"><input type="checkbox" data-cat="ads"><i></i></label></div>
-      <div class="row"><span>Rastreadores</span><label class="switch"><input type="checkbox" data-cat="privacy"><i></i></label></div>
-      <div class="row" data-row="annoyances"><span>Avisos de cookies<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="annoyances"><i></i></label></div>
-      <div class="row"><span>Filtros en español</span><label class="switch"><input type="checkbox" data-cat="regional"><i></i></label></div>
+      <h2 data-i18n="protection"></h2>
+      <div class="row"><span data-i18n="ads"></span><label class="switch"><input type="checkbox" data-cat="ads"><i></i></label></div>
+      <div class="row"><span data-i18n="trackers"></span><label class="switch"><input type="checkbox" data-cat="privacy"><i></i></label></div>
+      <div class="row" data-row="annoyances"><span><span data-i18n="cookieNotices"></span><em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="annoyances"><i></i></label></div>
+      <div class="row"><span data-i18n="regionalFilters"></span><label class="switch"><input type="checkbox" data-cat="regional"><i></i></label></div>
     </section>
     <section>
-      <h2>Privacidad</h2>
-      <div class="row" data-row="clean"><span>Limpiar links de rastreo<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="clean"><i></i></label></div>
-      <div class="row" data-row="gpc"><span>Pedir que no vendan mis datos<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="gpc"><i></i></label></div>
-      <div class="row" data-row="cookies"><span>Bloquear cookies de terceros<em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="cookies"><i></i></label></div>
+      <h2 data-i18n="privacy"></h2>
+      <div class="row" data-row="clean"><span><span data-i18n="cleanLinks"></span><em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="clean"><i></i></label></div>
+      <div class="row" data-row="gpc"><span><span data-i18n="gpc"></span><em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="gpc"><i></i></label></div>
+      <div class="row" data-row="cookies"><span><span data-i18n="thirdPartyCookies"></span><em class="pro">PRO</em></span><label class="switch"><input type="checkbox" data-cat="cookies"><i></i></label></div>
     </section>
     <section>
-      <div class="lic"><span id="licText">Versión gratuita</span><button class="link" id="licBtn">Pasate a Pro</button></div>
+      <div class="lic"><span id="licText"></span><button class="link" id="licBtn"></button></div>
     </section>
   </div>
-  <div class="note" id="note">Los cambios se aplican al recargar la página.</div>
-  <footer><button class="link" id="about">Licencias y código fuente</button></footer>
+  <div class="note" id="note" data-i18n="applyOnReload"></div>
+  <footer><button class="link" id="about" data-i18n="licensesSource"></button></footer>
+  <script src="lib/i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

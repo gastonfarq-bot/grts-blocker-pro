@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GRTS Blocker Pro · Licencia</title>
+<title>GRTS Blocker Pro</title>
 <style>
   :root { --bg: #ffffff; --fg: #1d1d1f; --muted: #5f5f66; --line: #e5e5ea; --accent: #c0392b; --card: #f5f5f7; --ok: #1e7d4f; --link: #c0392b; }
   @media (prefers-color-scheme: dark) { :root { --bg: #121212; --fg: #f2f2f2; --muted: #b0b0b5; --line: #333; --card: #1d1d1d; --ok: #4cc38a; --link: #ff7b6b; } }
@@ -33,7 +33,7 @@
   a { color: var(--link); }
 </style>
 </head>
-<body>
+<body data-i18n-doc="optTitle">
 <main>
   <header>
     <img src="icons/128.png" alt="">
@@ -41,39 +41,40 @@
   </header>
 
   <section id="licencia">
-    <h2>Licencia Pro</h2>
+    <h2 data-i18n="proLicense"></h2>
     <div class="card" id="status"></div>
     <div id="activateBox" style="margin-top: 16px">
-      <p class="muted">Con GRTS Pro sumás:</p>
+      <p class="muted" data-i18n="withPro"></p>
       <ul class="feats">
-        <li>Cierre automático de avisos de cookies</li>
-        <li>Limpieza de links de rastreo</li>
-        <li>Señal «No vender mis datos» (Global Privacy Control)</li>
-        <li>Bloqueo de cookies de terceros</li>
-        <li>Eliminar cualquier elemento de una página con un clic</li>
+        <li data-i18n="featCookies"></li>
+        <li data-i18n="featClean"></li>
+        <li data-i18n="featGpc"></li>
+        <li data-i18n="featCookies3p"></li>
+        <li data-i18n="featPicker"></li>
       </ul>
-      <label for="key" style="display: block; margin-top: 18px; font-weight: 600">Pegá tu licencia</label>
+      <label for="key" style="display: block; margin-top: 18px; font-weight: 600" data-i18n="pasteLicense"></label>
       <textarea id="key" placeholder="GRTS-…" spellcheck="false" autocomplete="off"></textarea>
-      <div class="actions"><button id="activate" type="button">Activar Pro</button></div>
+      <div class="actions"><button id="activate" type="button" data-i18n="activatePro"></button></div>
     </div>
-    <div class="actions" id="deactBox" hidden><button class="sec" id="deactivate" type="button">Quitar la licencia de este navegador</button></div>
+    <div class="actions" id="deactBox" hidden><button class="sec" id="deactivate" type="button" data-i18n="removeLicense"></button></div>
     <p id="msg" role="status"></p>
   </section>
 
   <section id="acerca">
-    <h2>Licencias y código fuente</h2>
-    <p>GRTS Blocker Pro es software libre, publicado bajo la <b>Licencia Pública General de GNU, versión 3 (GPL-3.0)</b>. Podés usarlo, estudiarlo, modificarlo y compartirlo según esa licencia; el texto completo está en el archivo <code>LICENSE</code> incluido en la extensión.</p>
+    <h2 data-i18n="licensesSource"></h2>
+    <p data-i18n="gplText"></p>
     <p id="source" class="muted"></p>
-    <p>Los filtros se construyen a partir de estas listas públicas, a cuyos autores agradecemos su trabajo:</p>
+    <p data-i18n="listsIntro"></p>
     <div class="scroll">
       <table>
-        <thead><tr><th>Lista</th><th>Licencia</th><th>Sitio</th></tr></thead>
+        <thead><tr><th data-i18n="colList"></th><th data-i18n="colLicense"></th><th data-i18n="colSite"></th></tr></thead>
         <tbody id="lists"></tbody>
       </table>
     </div>
-    <p class="muted" style="margin-top: 12px">Los scriptlets y los recursos de reemplazo (por ejemplo, los sustitutos de Google Analytics y Google Publisher Tag) están basados en los de <a href="https://github.com/gorhill/uBlock" target="_blank" rel="noopener">uBlock Origin</a> (GPL-3.0), de Raymond Hill y colaboradores.</p>
+    <p class="muted" style="margin-top: 12px"><span data-i18n="creditsUboBefore"></span> <a href="https://github.com/gorhill/uBlock" target="_blank" rel="noopener">uBlock Origin</a> <span data-i18n="creditsUboAfter"></span></p>
   </section>
 </main>
+<script src="lib/i18n.js"></script>
 <script src="options.js"></script>
 </body>
 </html>

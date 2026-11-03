@@ -23,7 +23,7 @@ async function fetchText(url) {
     } catch {}
     await new Promise((res) => setTimeout(res, 2000 * (attempt + 1)));
   }
-  throw new Error('No se pudo descargar ' + url.split('/').slice(-2).join('/'));
+  throw new Error('download|' + url.split('/').slice(-2).join('/'));
 }
 
 export async function run(sources) {

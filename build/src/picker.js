@@ -23,7 +23,8 @@
   box.hidden = true;
   const bar = document.createElement('div');
   bar.className = 'bar';
-  const HINT = 'Tocá el anuncio que querés eliminar · Esc para salir';
+  const tr = (k) => chrome.i18n.getMessage(k) || k;
+  const HINT = tr('pickHint');
   const showHint = () => {
     const span = document.createElement('span');
     span.className = 'hint';
@@ -82,9 +83,9 @@
     const input = document.createElement('input');
     input.type = 'text';
     input.value = selectorFor(target);
-    const wider = document.createElement('button'); wider.textContent = 'Más grande';
-    const ok = document.createElement('button'); ok.textContent = 'Bloquear'; ok.className = 'ok';
-    const cancel = document.createElement('button'); cancel.textContent = 'Cancelar';
+    const wider = document.createElement('button'); wider.textContent = tr('pickBigger');
+    const ok = document.createElement('button'); ok.textContent = tr('pickBlock'); ok.className = 'ok';
+    const cancel = document.createElement('button'); cancel.textContent = tr('pickCancel');
     bar.append(input, wider, ok, cancel);
     const preview = () => { try { show(document.querySelector(input.value)); } catch { show(null); } };
     input.addEventListener('input', preview);

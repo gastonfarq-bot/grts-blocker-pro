@@ -6,7 +6,7 @@ const send = (m) => chrome.runtime.sendMessage(m);
   let host = '';
   try { host = new URL(tab.url).hostname.replace(/^www\./, ''); } catch {}
   const web = /^https?:/.test(tab?.url || '');
-  $('#host').textContent = web ? host : 'Página interna del navegador';
+  $('#host').textContent = web ? host : t('internalPage');
 
   const st = await send({ t: 'state', host });
   $('#enabled').checked = st.enabled;
@@ -26,21 +26,21 @@ const send = (m) => chrome.runtime.sendMessage(m);
     row.querySelector('.pro').hidden = st.pro;
     row.classList.toggle('locked', !st.pro);
     const input = row.querySelector('input');
-    if (!st.pro) { input.checked = false; input.disabled = true; row.onclick = openOptions; row.title = 'Disponible en GRTS Pro'; }
+    if (!st.pro) { input.checked = false; input.disabled = true; row.onclick = openOptions; row.title = t('availablePro'); }
   }
-  $('#licText').textContent = st.pro ? `GRTS Pro · ${st.licenseInfo?.n || ''}` : 'Versión gratuita';
-  $('#licBtn').textContent = st.pro ? 'Licencia' : 'Pasate a Pro';
+  $('#licText').textContent = st.pro ? `GRTS Pro · ${st.licenseInfo?.n || ''}` : t('freeVersion');
+  $('#licBtn').textContent = st.pro ? t('license') : t('goPro');
   $('#licBtn').onclick = openOptions;
   $('#about').onclick = () => { chrome.tabs.create({ url: chrome.runtime.getURL('options.html#acerca') }); window.close(); };
 
   try {
     const { rulesMatchedInfo } = await chrome.declarativeNetRequest.getMatchedRules({ tabId: tab.id });
-    $('#blocked').textContent = rulesMatchedInfo.filter((r) => r.rule.rulesetId !== '_dynamic').length.toLocaleString('es-AR');
+    $('#blocked').textContent = rulesMatchedInfo.filter((r) => r.rule.rulesetId !== '_dynamic').length.toLocaleString(chrome.i18n.getUILanguage());
   } catch {
     // Firefox no informa las reglas aplicadas: se usa el contador del ícono si existe
-    let t = '';
-    try { t = await chrome.action.getBadgeText({ tabId: tab.id }); } catch {}
-    $('#blocked').textContent = t || (st.firefox ? '—' : '0');
+    let badge = '';
+    try { badge = await chrome.action.getBadgeText({ tabId: tab.id }); } catch {}
+    $('#blocked').textContent = badge || (st.firefox ? '—' : '0');
   }
 
   const renderCustom = (list) => {
@@ -54,7 +54,7 @@ const send = (m) => chrome.runtime.sendMessage(m);
       code.title = sel;
       const b = document.createElement('button');
       b.textContent = '✕';
-      b.title = 'Quitar regla';
+      b.title = t('removeRule');
       b.onclick = async () => { await send({ t: 'removeCustom', host, selector: sel }); renderCustom(list.filter((s) => s !== sel)); };
       li.append(code, b);
       ul.append(li);
@@ -64,17 +64,17 @@ const send = (m) => chrome.runtime.sendMessage(m);
 
   $('#enabled').onchange = async (e) => {
     $('#body').classList.toggle('off', !e.target.checked);
-    $('#note').textContent = 'Aplicando…';
+    $('#note').textContent = t('applying');
     await send({ t: 'toggle', value: e.target.checked });
     chrome.tabs.reload(tab.id);
   };
   $('#pause').onchange = async (e) => {
-    $('#note').textContent = 'Aplicando…';
+    $('#note').textContent = t('applying');
     await send({ t: 'pause', host, value: e.target.checked });
     chrome.tabs.reload(tab.id);
   };
   for (const el of document.querySelectorAll('[data-cat]')) {
-    el.onchange = async () => { $('#note').textContent = 'Aplicando…'; await send({ t: 'category', id: el.dataset.cat, value: el.checked }); $('#note').textContent = 'Los cambios se aplican al recargar la página.'; };
+    el.onchange = async () => { $('#note').textContent = t('applying'); await send({ t: 'category', id: el.dataset.cat, value: el.checked }); $('#note').textContent = t('applyOnReload'); };
   }
   $('#pick').onclick = async () => {
     if (!st.pro) return openOptions();
@@ -82,19 +82,19 @@ const send = (m) => chrome.runtime.sendMessage(m);
   };
 
   // ---- Estado de actualización de filtros ----
-  const ago = (t) => {
-    const d = Math.floor((Date.now() - t) / 86400000);
-    if (d <= 0) return 'hoy';
-    if (d === 1) return 'ayer';
-    return `hace ${d} días`;
+  const ago = (when) => {
+    const d = Math.floor((Date.now() - when) / 86400000);
+    if (d <= 0) return t('today');
+    if (d === 1) return t('yesterday');
+    return t('daysAgo', d);
   };
   const renderUpd = (s) => {
     const us = s.updateStatus;
     const btn = $('#updNow');
-    if (us && us.running) { $('#upd').textContent = 'Actualizando filtros…'; btn.disabled = true; return true; }
+    if (us && us.running) { $('#upd').textContent = t('updating'); btn.disabled = true; return true; }
     btn.disabled = false;
-    let txt = s.lastUpdate ? `Actualizados ${ago(s.lastUpdate)}` : 'Sin actualizar';
-    if (us && us.ok === false) txt = 'No se pudo actualizar: ' + us.error;
+    let txt = s.lastUpdate ? t('updatedWhen', ago(s.lastUpdate)) : t('notUpdated');
+    if (us && us.ok === false) txt = t('updateFailed', us.error);
     $('#upd').textContent = txt;
     return false;
   };

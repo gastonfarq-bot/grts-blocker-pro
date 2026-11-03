@@ -20,11 +20,12 @@ sys.path.insert(0, str(HERE))
 from net import Network, norm_host  # noqa: E402
 from cosmetic import Cosmetic  # noqa: E402
 from privacy_extras import EXTRAS  # noqa: E402
+from i18n_messages import messages_json  # noqa: E402
 
 LISTS_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / 'lists'
 DIST = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE.parent / 'dist'
 OUT = DIST / '_core'
-VERSION = '2.0.1'
+VERSION = '2.1.0'
 NAME = 'GRTS Blocker Pro'
 GECKO_ID = 'grts-blocker-pro@grts-blocker.app'
 
@@ -90,7 +91,8 @@ def make_manifest(target):
     m = {
         'manifest_version': 3,
         'name': NAME,
-        'description': 'Bloquea publicidad, rastreadores y avisos molestos. Filtros actualizados automáticamente.',
+        'description': '__MSG_extDesc__',
+        'default_locale': 'en',
         'version': VERSION,
         'permissions': perms,
         'host_permissions': ['<all_urls>'],
@@ -281,6 +283,10 @@ def main():
     shutil.copytree(HERE / 'src' / 'icons', OUT / 'icons')
     shutil.copy(HERE.parent / 'LICENSE', OUT / 'LICENSE')
     shutil.copy(HERE.parent / 'CREDITS.md', OUT / 'CREDITS.md')
+    for idx, lang in enumerate(('es', 'en')):
+        (OUT / '_locales' / lang).mkdir(parents=True)
+        (OUT / '_locales' / lang / 'messages.json').write_text(
+            json.dumps(messages_json(idx), indent=1, ensure_ascii=False), encoding='utf-8')
 
     # ---- variantes por navegador ----
     built_at = int(__import__('time').time() * 1000)

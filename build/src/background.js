@@ -266,7 +266,7 @@ function runUpdate() {
         await ensureOffscreen();
         const done = new Promise((r) => (doneResolve = r));
         await chrome.runtime.sendMessage({ t: 'updater-run' });
-        res = await Promise.race([done, new Promise((r) => setTimeout(() => r({ ok: false, error: 'Tiempo de espera agotado' }), 10 * 60 * 1000))]);
+        res = await Promise.race([done, new Promise((r) => setTimeout(() => r({ ok: false, error: 'timeout' }), 10 * 60 * 1000))]);
       } else {
         // Firefox: la página de fondo tiene DOM, el actualizador corre acá mismo
         const { run } = await import('./lib/updater-core.js');
@@ -277,7 +277,12 @@ function runUpdate() {
       await exclusive(async () => { await applyNetwork(); await registerAll(); });
       await store.set({ lastUpdate: Date.now(), updateStatus: { running: false, ok: true, stats: res.stats, at: Date.now() } });
     } catch (e) {
-      await store.set({ updateStatus: { running: false, ok: false, error: String(e.message || e), at: Date.now() } });
+      // los errores llegan como códigos ('timeout', 'download|archivo') y se traducen acá
+      const raw = String(e.message || e);
+      const [code, arg] = raw.split('|');
+      const error = code === 'timeout' ? chrome.i18n.getMessage('timeout')
+        : code === 'download' ? chrome.i18n.getMessage('downloadFailed', [arg]) : raw;
+      await store.set({ updateStatus: { running: false, ok: false, error, at: Date.now() } });
     } finally {
       clearInterval(keepAlive);
       try { await chrome.offscreen?.closeDocument(); } catch {}
@@ -390,8 +395,8 @@ async function handle(msg, sender) {
     }
     case 'activate': {
       const info = await verifyLicense(msg.key);
-      if (!info) return { ok: false, error: 'La licencia no es válida. Revisá que esté completa.' };
-      if (info.expired) return { ok: false, error: `La licencia venció el ${info.x}.` };
+      if (!info) return { ok: false, error: chrome.i18n.getMessage('licenseInvalid') };
+      if (info.expired) return { ok: false, error: chrome.i18n.getMessage('licenseExpired', [new Date(info.x + 'T12:00:00').toLocaleDateString(chrome.i18n.getUILanguage())]) };
       await store.set({ license: String(msg.key).trim().replace(/\s+/g, ''), pro: true, licenseInfo: info });
       await exclusive(applyAll);
       return { ok: true, info };
