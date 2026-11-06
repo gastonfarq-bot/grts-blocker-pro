@@ -38,7 +38,7 @@ jobs:
 
       - name: Compilar las tres variantes
         env:
-          GRTS_BUILD: ${{ github.run_number }}   # versión 2.2.0.<número de compilación>
+          GRTS_BUILD: ${{ github.run_number }}   # versión 2.3.0.<número de compilación>
         run: python build/build.py
 
       - name: Empaquetar

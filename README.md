@@ -26,6 +26,7 @@ Software libre bajo **GPL-3.0** (ver `LICENSE` y `CREDITS.md`).
 | Carpeta | Para qué | Actualización de filtros |
 |---|---|---|
 | `GRTSBlockerPro-chrome` | Instalación directa («Cargar descomprimida») en Chrome, Edge, Brave, Opera | Completa cada 3 días (red + filtros de página, con «Permitir scripts de usuario») |
+| `GRTSBlockerPro-local` | Sólo para pruebas propias: igual a `chrome` pero con todas las funciones Pro destrabadas, sin licencia. No publicarla | Completa cada 3 días |
 | `GRTSBlockerPro-store` | Chrome Web Store, Edge Add-ons, Opera Add-ons | Red cada 3 días; filtros de página con cada versión nueva |
 | `GRTSBlockerPro-firefox` | addons.mozilla.org (Firefox 140+ escritorio, 142+ Android) | Red cada 3 días; filtros de página con cada versión nueva |
 
@@ -76,7 +77,7 @@ comodidad, las actualizaciones y el soporte, como hacen AdGuard y otros producto
 
 Todos los lunes, GitHub Actions compila con las listas del día y sube `GRTSBlockerPro-store.zip` a las dos
 tiendas con `build/tools/publicar_tiendas.py` (también a mano: Actions → *Run workflow* → «Subir a las tiendas»).
-La versión lleva como cuarto número el de la compilación (por ejemplo `2.2.0.57`), porque las tiendas exigen
+La versión lleva como cuarto número el de la compilación (por ejemplo `2.3.0.57`), porque las tiendas exigen
 que cada paquete sea mayor que el anterior. Si una tienda todavía está revisando la versión anterior, esa
 semana se saltea. Si algo falla, GitHub avisa por mail.
 

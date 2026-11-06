@@ -13,7 +13,7 @@ async function render() {
   const line = (txt, bold) => { const p = document.createElement('p'); p.textContent = txt; if (bold) p.style.fontWeight = '600'; status.append(p); };
   if (st.pro) {
     line(t('proActive'), true);
-    line(`${t('licensedTo', info.n, info.e)} · ${info.x ? t('expiresOn', fmtDate(info.x)) : t('noExpiry')}`);
+    if (info) line(`${t('licensedTo', info.n, info.e)} · ${info.x ? t('expiresOn', fmtDate(info.x)) : t('noExpiry')}`);
   } else if (info?.expired) {
     line(t('expiredOn', fmtDate(info.x)), true);
     line(t('expiredHint'));
@@ -22,7 +22,7 @@ async function render() {
     line(t('freeDesc'));
   }
   $('#activateBox').hidden = st.pro;
-  $('#deactBox').hidden = !st.pro && !info;
+  $('#deactBox').hidden = !info;
 }
 
 $('#activate').onclick = async () => {

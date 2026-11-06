@@ -22,4 +22,5 @@ Las listas se descargan sin modificar su contenido; GRTS las convierte al format
 - Los scriptlets (`src/scriptlets.js`) y los recursos de reemplazo (`src/res/`: sustitutos de Google Analytics,
   Google Tag Manager, Google Publisher Tag, AdSense y Amazon apstag) están basados en los de
   **uBlock Origin** — Raymond Hill y colaboradores — https://github.com/gorhill/uBlock — GPL-3.0.
+  La clase JSONPath incluida en `src/scriptlets.js` es un port directo de `src/js/jsonpath.js` de uBlock Origin.
 - La sintaxis de filtros sigue las convenciones de Adblock Plus, uBlock Origin y AdGuard.

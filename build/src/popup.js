@@ -28,7 +28,7 @@ const send = (m) => chrome.runtime.sendMessage(m);
     const input = row.querySelector('input');
     if (!st.pro) { input.checked = false; input.disabled = true; row.onclick = openOptions; row.title = t('availablePro'); }
   }
-  $('#licText').textContent = st.pro ? `GRTS Pro · ${st.licenseInfo?.n || ''}` : t('freeVersion');
+  $('#licText').textContent = st.pro ? 'GRTS Pro' + (st.licenseInfo?.n ? ` · ${st.licenseInfo.n}` : '') : t('freeVersion');
   $('#licBtn').textContent = st.pro ? t('license') : t('goPro');
   $('#licBtn').onclick = openOptions;
 

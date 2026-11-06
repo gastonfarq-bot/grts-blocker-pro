@@ -25,8 +25,8 @@ from i18n_messages import messages_json  # noqa: E402
 LISTS_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / 'lists'
 DIST = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE.parent / 'dist'
 OUT = DIST / '_core'
-VERSION = '2.2.0'
-# En GitHub Actions se agrega el número de compilación como cuarto número (2.2.0.57):
+VERSION = '2.3.0'
+# En GitHub Actions se agrega el número de compilación como cuarto número (2.3.0.57):
 # las tiendas exigen que cada paquete nuevo tenga una versión mayor que la anterior.
 if os.environ.get('GRTS_BUILD', '').isdigit():
     VERSION = VERSION + '.' + str(int(os.environ['GRTS_BUILD']))
@@ -90,7 +90,7 @@ def make_manifest(target):
              'alarms', 'unlimitedStorage']
     if target != 'firefox':
         perms.append('offscreen')       # el actualizador corre en un documento offscreen
-    if target == 'chrome':
+    if target in ('chrome', 'local'):
         perms.append('userScripts')     # actualización completa de filtros de página (instalación directa)
     m = {
         'manifest_version': 3,
@@ -294,7 +294,9 @@ def main():
 
     # ---- variantes por navegador ----
     built_at = int(__import__('time').time() * 1000)
-    for target in ('chrome', 'store', 'firefox'):
+    # 'local' es igual a 'chrome' pero con el Pro destrabado (ver checkLicense); es sólo para
+    # pruebas propias: no se sube a GitHub ni a Releases (el workflow empaqueta sólo las otras tres).
+    for target in ('chrome', 'store', 'firefox', 'local'):
         dest = DIST / f'GRTSBlockerPro-{target}'
         if dest.exists():
             shutil.rmtree(dest)

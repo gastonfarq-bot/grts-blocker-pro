@@ -48,6 +48,8 @@ const SUPPORTED_SCRIPTLETS = new Set([
   'set-local-storage-item', 'set-session-storage-item', 'click-element', 'remove-node-text',
   'replace-node-text', 'prevent-element-src-loading', 'nowebrtc', 'prevent-eval-if',
   'href-sanitizer', 'popads-dummy', 'prevent-refresh',
+  'trusted-edit-inbound-object', 'json-edit-fetch-response', 'trusted-json-edit-fetch-response',
+  'trusted-prevent-dom-bypass',
 ]);
 
 function canonScriptlet(name) {

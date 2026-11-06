@@ -39,11 +39,13 @@ async function settings() {
   return { enabled: s.enabled !== false, categories, chosen, paused: s.paused || [], pro: !!s.pro };
 }
 
-// Revisa la licencia guardada (por si venció) y devuelve si hay Pro
+// Revisa la licencia guardada (por si venció) y devuelve si hay Pro.
+// La variante 'local' (pruebas propias) viene siempre completa, sin licencia.
 async function checkLicense() {
   const { license } = await store.get('license');
   const info = license ? await verifyLicense(license) : null;
-  const pro = !!info && !info.expired;
+  const full = (await meta()).target === 'local';
+  const pro = full || (!!info && !info.expired);
   await store.set({ pro, licenseInfo: info });
   return pro;
 }
