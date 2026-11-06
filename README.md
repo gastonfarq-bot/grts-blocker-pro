@@ -72,6 +72,25 @@ comodidad, las actualizaciones y el soporte, como hacen AdGuard y otros producto
 7. **Cobrar**: las tiendas de extensiones no procesan pagos. Vender la licencia por Mercado Pago, Stripe,
    Lemon Squeezy o Gumroad y enviarla al cliente (se puede automatizar con `generar_licencia.py`).
 
+### Publicación automática (Chrome y Edge)
+
+Todos los lunes, GitHub Actions compila con las listas del día y sube `GRTSBlockerPro-store.zip` a las dos
+tiendas con `build/tools/publicar_tiendas.py` (también a mano: Actions → *Run workflow* → «Subir a las tiendas»).
+La versión lleva como cuarto número el de la compilación (por ejemplo `2.2.0.57`), porque las tiendas exigen
+que cada paquete sea mayor que el anterior. Si una tienda todavía está revisando la versión anterior, esa
+semana se saltea. Si algo falla, GitHub avisa por mail.
+
+Secrets necesarios (Settings → Secrets and variables → Actions):
+
+| Secret | De dónde sale |
+|---|---|
+| `CWS_PUBLISHER_ID` | Chrome Web Store → Configuración → ID de editor |
+| `CWS_SERVICE_ACCOUNT` | Google Cloud: cuenta de servicio con la «Chrome Web Store API» habilitada; pegar su clave JSON completa. Su email se agrega en Chrome Web Store → Cuenta |
+| `EDGE_CLIENT_ID` | Partner Center → Microsoft Edge → Publish API → Create API credentials |
+| `EDGE_API_KEY` | ídem (la clave vence: renovarla antes de la fecha que muestra Partner Center) |
+
+Si faltan los secrets de una tienda, esa tienda se saltea sin error.
+
 ## iPhone y Mac
 
 Próxima etapa: app con extensión de Safari (reutiliza esta extensión) y protección para todo el teléfono

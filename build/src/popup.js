@@ -31,7 +31,6 @@ const send = (m) => chrome.runtime.sendMessage(m);
   $('#licText').textContent = st.pro ? `GRTS Pro · ${st.licenseInfo?.n || ''}` : t('freeVersion');
   $('#licBtn').textContent = st.pro ? t('license') : t('goPro');
   $('#licBtn').onclick = openOptions;
-  $('#about').onclick = () => { chrome.tabs.create({ url: chrome.runtime.getURL('options.html#acerca') }); window.close(); };
 
   try {
     const { rulesMatchedInfo } = await chrome.declarativeNetRequest.getMatchedRules({ tabId: tab.id });

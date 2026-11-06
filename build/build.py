@@ -25,7 +25,11 @@ from i18n_messages import messages_json  # noqa: E402
 LISTS_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / 'lists'
 DIST = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE.parent / 'dist'
 OUT = DIST / '_core'
-VERSION = '2.1.0'
+VERSION = '2.2.0'
+# En GitHub Actions se agrega el número de compilación como cuarto número (2.2.0.57):
+# las tiendas exigen que cada paquete nuevo tenga una versión mayor que la anterior.
+if os.environ.get('GRTS_BUILD', '').isdigit():
+    VERSION = VERSION + '.' + str(int(os.environ['GRTS_BUILD']))
 NAME = 'GRTS Blocker Pro'
 GECKO_ID = 'grts-blocker-pro@grts-blocker.app'
 

@@ -30,6 +30,11 @@
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { color: var(--muted); font-weight: 600; }
   .scroll { overflow-x: auto; }
+  /* avisos legales: discretos, plegados al final de la página */
+  details.legal { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+  details.legal summary { cursor: pointer; }
+  details.legal[open] summary { margin-bottom: 12px; }
+  details.legal table { font-size: 13px; }
   a { color: var(--link); }
 </style>
 </head>
@@ -60,8 +65,8 @@
     <p id="msg" role="status"></p>
   </section>
 
-  <section id="acerca">
-    <h2 data-i18n="licensesSource"></h2>
+  <details class="legal" id="acerca">
+    <summary data-i18n="legalNotices"></summary>
     <p data-i18n="gplText"></p>
     <p id="source" class="muted"></p>
     <p data-i18n="listsIntro"></p>
@@ -72,7 +77,7 @@
       </table>
     </div>
     <p class="muted" style="margin-top: 12px"><span data-i18n="creditsUboBefore"></span> <a href="https://github.com/gorhill/uBlock" target="_blank" rel="noopener">uBlock Origin</a> <span data-i18n="creditsUboAfter"></span></p>
-  </section>
+  </details>
 </main>
 <script src="lib/i18n.js"></script>
 <script src="options.js"></script>

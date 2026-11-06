@@ -1,5 +1,8 @@
 # Compila GRTS Blocker Pro con las listas de filtros del día y publica los paquetes.
 # Corre todos los lunes, en cada cambio del código y cuando se lo pide a mano.
+# Los lunes además sube la versión nueva a la Chrome Web Store y a Edge Add-ons
+# (a mano, con "Run workflow" y la opción "Subir a las tiendas").
+# Necesita los secrets CWS_PUBLISHER_ID, CWS_SERVICE_ACCOUNT, EDGE_CLIENT_ID y EDGE_API_KEY.
 name: Compilar GRTS Blocker Pro
 
 on:
@@ -8,6 +11,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      tiendas:
+        description: 'Subir a las tiendas (Chrome y Edge)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -29,6 +37,8 @@ jobs:
         run: python build/tools/descargar_listas.py
 
       - name: Compilar las tres variantes
+        env:
+          GRTS_BUILD: ${{ github.run_number }}   # versión 2.2.0.<número de compilación>
         run: python build/build.py
 
       - name: Empaquetar
@@ -53,3 +63,12 @@ jobs:
           gh release delete "$TAG" -y --cleanup-tag 2>/dev/null || true
           gh release create "$TAG" dist/*.zip --title "GRTS Blocker Pro – filtros del $(date -u +%d/%m/%Y)" \
             --notes "Paquetes compilados automáticamente con las listas de filtros del día."
+
+      - name: Subir a Chrome Web Store y Edge Add-ons
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.tiendas)
+        env:
+          CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+          CWS_SERVICE_ACCOUNT: ${{ secrets.CWS_SERVICE_ACCOUNT }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+        run: python build/tools/publicar_tiendas.py dist/GRTSBlockerPro-store.zip

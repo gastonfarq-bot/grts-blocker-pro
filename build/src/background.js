@@ -8,7 +8,9 @@ const IS_FIREFOX = /Firefox\//.test(navigator.userAgent);
 const RULESETS = ['ads', 'privacy', 'annoyances', 'regional']; // provienen de las listas
 const EXTRAS = ['clean', 'gpc', 'cookies'];                     // reglas de privacidad propias
 const ALL_RULESETS = [...RULESETS, ...EXTRAS];
-const PAUSE_RULE_BASE = 100000;
+const OFF_RULE_ID = 90000;      // regla dinámica que apaga todo el bloqueo (interruptor general)
+const PAUSE_RULE_BASE = 100000; // reglas dinámicas de los sitios pausados
+// las reglas de las listas actualizadas usan los IDs 1…OFF_RULE_ID-1
 const UPDATE_EVERY_MS = 3 * 24 * 3600 * 1000; // cada 3 días
 const DNR = chrome.declarativeNetRequest;
 
@@ -49,6 +51,7 @@ async function checkLicense() {
 async function applyAll() {
   await applyRulesets();
   await applyNetwork();
+  await applyEnabledRule();
   await refreshExclusions();
 }
 
@@ -77,11 +80,25 @@ async function getUserPlan() {
   return plan;
 }
 
-async function exclusionsFor(p) {
-  const { enabled, paused, categories } = await settings();
-  if (!enabled || (p.cat && categories[p.cat] === false)) return ['*://*/*'];
-  return [...(p.excludeMatches || []), ...paused.map(patternFor)];
+// ¿El script puede ejecutarse en el sitio h (o en sus subdominios)?
+const ALL_URLS = new Set(['http://*/*', 'https://*/*', '*://*/*', '<all_urls>']);
+const hostsCache = new WeakMap();
+function covers(p, h) {
+  let hosts = hostsCache.get(p);
+  if (!hosts) {
+    hosts = p.matches.map((m) => (ALL_URLS.has(m) ? '*' : (m.match(/^[^:]+:\/\/(?:\*\.)?([^/]+)\//)?.[1] || '*')));
+    hostsCache.set(p, hosts);
+  }
+  return hosts.some((k) => k === '*' || k === h || k.endsWith('.' + h) || h.endsWith('.' + k));
 }
+
+// Exclusiones de un script. Un sitio pausado sólo se agrega a los scripts que podrían correr en él
+// (listas de exclusión más cortas = menos datos que el navegador reparte a cada pestaña).
+function exclusionsFor(p, { enabled, paused, categories }) {
+  if (!enabled || (p.cat && categories[p.cat] === false)) return ['*://*/*'];
+  return [...(p.excludeMatches || []), ...paused.filter((h) => covers(p, h)).map(patternFor)];
+}
+const sameList = (a = [], b = []) => a.length === b.length && [...a].sort().join('\n') === [...b].sort().join('\n');
 
 async function currentMode() {
   return userScriptsAvailable() && (await idbGet('update'))?.cosmetic ? 'user' : 'static';
@@ -93,6 +110,7 @@ async function registerAll() {
   if ((await chrome.scripting.getRegisteredContentScripts()).length) await chrome.scripting.unregisterContentScripts();
   if (userScriptsAvailable()) { try { await chrome.userScripts.unregister(); } catch {} }
 
+  const st = await settings();
   const cs = [];
   for (const p of staticPlan) {
     if (mode === 'user' && !p.keep) continue; // en modo actualizado lo reemplazan los scripts de usuario
@@ -101,7 +119,7 @@ async function registerAll() {
     if (!IS_FIREFOX) s.matchOriginAsFallback = true;
     if (p.js) s.js = p.js;
     if (p.css) s.css = p.css;
-    const ex = await exclusionsFor(p);
+    const ex = exclusionsFor(p, st);
     if (ex.length) s.excludeMatches = ex;
     cs.push(s);
   }
@@ -113,7 +131,7 @@ async function registerAll() {
     for (const p of await getUserPlan()) {
       const s = { id: p.id, matches: p.matches, runAt: 'document_start', allFrames: true, world: p.world,
         js: [p.file ? { file: p.file } : { code: p.code }] };
-      const ex = await exclusionsFor(p);
+      const ex = exclusionsFor(p, st);
       if (ex.length) s.excludeMatches = ex;
       us.push(s);
     }
@@ -127,40 +145,64 @@ async function refreshExclusions() {
   const { mode: registeredMode } = await store.get('mode');
   if (mode !== registeredMode) return registerAll();
   staticPlan ||= await getJSON('scripts.json');
-  const registered = new Set((await chrome.scripting.getRegisteredContentScripts()).map((s) => s.id));
+  const st = await settings();
+  // Si nada cambió no se toca nada. Si algo cambió se actualizan TODOS los scripts en una sola
+  // llamada: medido en Chrome, actualizar sólo algunos tarda ~8 s (relee todo del disco) y todos, ~0,2 s.
+  const registered = new Map((await chrome.scripting.getRegisteredContentScripts()).map((s) => [s.id, s]));
   const csUpdates = [];
+  let csChanged = false;
   for (const p of staticPlan) {
     if (mode === 'user' && !p.keep) continue;
-    if (!registered.has(p.id)) return registerAll();
-    csUpdates.push({ id: p.id, excludeMatches: await exclusionsFor(p) });
+    const cur = registered.get(p.id);
+    if (!cur) return registerAll();
+    const ex = exclusionsFor(p, st);
+    if (!sameList(cur.excludeMatches, ex)) csChanged = true;
+    csUpdates.push({ id: p.id, excludeMatches: ex });
   }
-  await chrome.scripting.updateContentScripts(csUpdates);
+  if (csChanged) await chrome.scripting.updateContentScripts(csUpdates);
   if (mode === 'user') {
-    const regU = new Set((await chrome.userScripts.getScripts()).map((s) => s.id));
+    const regU = new Map((await chrome.userScripts.getScripts()).map((s) => [s.id, s]));
     const usUpdates = [];
+    let usChanged = false;
     for (const p of await getUserPlan()) {
-      if (!regU.has(p.id)) return registerAll();
-      usUpdates.push({ id: p.id, excludeMatches: await exclusionsFor(p) });
+      const cur = regU.get(p.id);
+      if (!cur) return registerAll();
+      const ex = exclusionsFor(p, st);
+      if (!sameList(cur.excludeMatches, ex)) usChanged = true;
+      usUpdates.push({ id: p.id, excludeMatches: ex });
     }
-    await chrome.userScripts.update(usUpdates);
+    if (usChanged) await chrome.userScripts.update(usUpdates);
   }
 }
 
 // ======================= Reglas de red =======================
+// Las listas quedan siempre cargadas; el interruptor general no las toca (ver applyEnabledRule)
 async function applyRulesets() {
-  const { enabled, categories } = await settings();
+  const { categories } = await settings();
   const enable = [], disable = [];
   for (const cat of ALL_RULESETS) {
-    const on = enabled && categories[cat] !== false;
+    const on = categories[cat] !== false;
     for (const part of await partsOf(cat)) (on ? enable : disable).push(part);
   }
   await DNR.updateEnabledRulesets({ enableRulesetIds: enable, disableRulesetIds: disable });
 }
 
+// Interruptor general: apagar es agregar una sola regla de máxima prioridad que deja pasar todo.
+// Antes se descargaban y recargaban las 240.000 reglas, y eso tildaba el navegador.
+async function applyEnabledRule() {
+  const { enabled } = await settings();
+  await DNR.updateDynamicRules({
+    removeRuleIds: [OFF_RULE_ID],
+    addRules: enabled ? [] : [{ id: OFF_RULE_ID, priority: 1000000, action: { type: 'allowAllRequests' },
+      condition: { resourceTypes: ['main_frame', 'sub_frame'] } }],
+  });
+}
+
 async function applyPausedRules() {
   const { paused } = await settings();
-  const current = await DNR.getDynamicRules();
-  const removeRuleIds = current.filter((r) => r.id >= PAUSE_RULE_BASE).map((r) => r.id);
+  // Se borra un rango fijo de IDs en vez de leer todas las reglas dinámicas (con miles de reglas
+  // actualizadas, leerlas tardaba más que el cambio en sí). Borrar IDs inexistentes no es un error.
+  const removeRuleIds = Array.from({ length: paused.length + 1000 }, (_, i) => PAUSE_RULE_BASE + i);
   const addRules = paused.map((h, i) => ({
     id: PAUSE_RULE_BASE + i, priority: 100, action: { type: 'allowAllRequests' },
     condition: { requestDomains: [h], resourceTypes: ['main_frame', 'sub_frame'] },
@@ -190,7 +232,7 @@ async function addDynamic(rules) {
 // Aplica la actualización de red: reglas nuevas como dinámicas y reglas viejas desactivadas
 async function applyNetwork() {
   const upd = await idbGet('update');
-  const { enabled, categories } = await settings();
+  const { categories } = await settings();
   let overflow = false;
 
   // 1) reglas incluidas que ya no existen en las listas
@@ -213,9 +255,9 @@ async function applyNetwork() {
   }
 
   // 2) reglas nuevas
-  const old = (await DNR.getDynamicRules()).filter((r) => r.id < PAUSE_RULE_BASE).map((r) => r.id);
+  const old = (await DNR.getDynamicRules()).filter((r) => r.id < OFF_RULE_ID).map((r) => r.id);
   if (old.length) await DNR.updateDynamicRules({ removeRuleIds: old });
-  if (!upd?.network || !enabled) { await store.set({ needsRebuild: overflow }); return; }
+  if (!upd?.network) { await store.set({ needsRebuild: overflow }); return; }
 
   let rules = [];
   for (const rs of RULESETS) if (categories[rs] !== false) rules.push(...(upd.network.dynamic[rs] || []));
@@ -228,6 +270,7 @@ async function applyNetwork() {
   let nSafe = 0, nUnsafe = 0, nRegex = 0;
   const out = [];
   for (const r of rules) {
+    if (out.length >= OFF_RULE_ID - 1) { overflow = true; break; } // no pisar los IDs reservados
     if (r.condition.regexFilter) {
       if (nRegex >= maxRegex) { overflow = true; continue; }
       const ok = await DNR.isRegexSupported?.({ regex: r.condition.regexFilter, isCaseSensitive: !!r.condition.isUrlFilterCaseSensitive }).catch(() => null);
@@ -330,8 +373,10 @@ chrome.runtime.onInstalled.addListener(async () => {
     try { chrome.action.setBadgeBackgroundColor({ color: '#c0392b' }); } catch {}
     await applyRulesets();
     await applyNetwork();
+    await applyEnabledRule();
     await applyPausedRules();
     if (!(await scriptsLookRegistered())) await registerAll();
+    else await refreshExclusions();
   });
   if (!(await chrome.alarms.get('auto-update'))) chrome.alarms.create('auto-update', { delayInMinutes: 5, periodInMinutes: 360 });
 });
@@ -409,7 +454,7 @@ async function handle(msg, sender) {
     case 'update': runUpdate(); return true;
     case 'toggle':
       await store.set({ enabled: msg.value });
-      await exclusive(async () => { await applyRulesets(); await applyNetwork(); await refreshExclusions(); });
+      await exclusive(async () => { await applyEnabledRule(); await refreshExclusions(); });
       return true;
     case 'category': {
       const { chosen, pro } = await settings();

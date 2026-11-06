@@ -37,6 +37,7 @@ MESSAGES = {
     'applyOnReload': ('Los cambios se aplican al recargar la página.', 'Changes apply when you reload the page.'),
     'applying': ('Aplicando…', 'Applying…'),
     'licensesSource': ('Licencias y código fuente', 'Licenses and source code'),
+    'legalNotices': ('Avisos legales y créditos', 'Legal notices and credits'),
     'availablePro': ('Disponible en GRTS Pro', 'Available in GRTS Pro'),
     'today': ('hoy', 'today'),
     'yesterday': ('ayer', 'yesterday'),
